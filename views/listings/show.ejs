@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+<% layout("/layouts/boilerPlate") %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust</title>
-</head>
 
 <body>
     <a href="/listing"><button>Home</button></a>
@@ -30,5 +24,3 @@
     <a href="/listing/<%= showListing._id %>/edit">Edit this listing</a>
     <form method="post" action="/listing/<%=showListing._id %>?_method=DELETE"><button>Delete</button></form>
 </body>
-
-</html>
