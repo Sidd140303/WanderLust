@@ -6,7 +6,7 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/WrapAsync.js");
-const ExpressError = require("./utils/ExpressError.js");
+const ExpressError = require("./utils/ExpressError");
 
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
@@ -50,7 +50,8 @@ app.get("/listing/:id", wrapAsync(async (req, res) => {
 
 //Create route
 app.post("/listing", wrapAsync(async (req, res, next) => {
-    if (!req.body) {
+
+    if (!req.body.listing) {
         throw new ExpressError(400, "Send valid data...");
     }
     const newListing = new listing(req.body.listing);
@@ -73,11 +74,11 @@ app.put("/listing/:id", wrapAsync(async (req, res) => {
 }))
 
 //Delete route
-app.delete("/listing/:id", async (req, res) => {
+app.delete("/listing/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     await listing.findByIdAndDelete(id);
     res.redirect("/listing");
-})
+}))
 
 app.get("/", (req, res) => {
     res.send("Started..");
@@ -87,10 +88,14 @@ app.get("/", (req, res) => {
 //     console.log(req.path);
 
 // });
+app.all("*", (req, res, next) => {
+    next(new ExpressError("Page Not Found", 404));
+});
 
 app.use((err, req, res, next) => {
     let { status = 500, message = "Something went wrong!" } = err;
-    res.status(status).send(message);
+    // res.status(status).send(message);
+    res.status(status).render("error.ejs", {err});
 })
 
 app.listen(8080, () => {
