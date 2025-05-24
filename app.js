@@ -25,6 +25,7 @@ async function main() {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
@@ -49,6 +50,9 @@ app.get("/listing/:id", wrapAsync(async (req, res) => {
 
 //Create route
 app.post("/listing", wrapAsync(async (req, res, next) => {
+    if (!req.body) {
+        throw new ExpressError(400, "Send valid data...");
+    }
     const newListing = new listing(req.body.listing);
     await newListing.save();
     res.redirect("/listing");
@@ -85,8 +89,8 @@ app.get("/", (req, res) => {
 // });
 
 app.use((err, req, res, next) => {
-    let { statusCode = 500, message = "Something went wrong!" } = err;
-    res.status(statusCode).send(message);
+    let { status = 500, message = "Something went wrong!" } = err;
+    res.status(status).send(message);
 })
 
 app.listen(8080, () => {
