@@ -88,9 +88,7 @@ app.get("/", (req, res) => {
 //     console.log(req.path);
 
 // });
-app.all("*", (req, res, next) => {
-    next(new ExpressError("Page Not Found", 404));
-});
+
 
 app.use((err, req, res, next) => {
     let { status = 500, message = "Something went wrong!" } = err;
