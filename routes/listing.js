@@ -4,6 +4,8 @@ const wrapAsync = require("../utils/WrapAsync.js");
 const { listingSchema } = require("../schema.js")
 const ExpressError = require("../utils/ExpressError");
 const listing = require("../models/listing.js");
+const methodOverride = require("method-override");
+
 
 const validateListing = (req, res, next) => {
     let { error } = listingSchema.validate(req.body);
@@ -30,6 +32,10 @@ router.get("/new", (req, res) => {
 router.get("/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const showListing = await listing.findById(id).populate("reviews");
+    if (!showListing) {
+        req.flash("error", "This listing doesn't exists..");
+        return res.redirect("/listing");
+    }
     res.render("listings/show.ejs", { showListing });
 
 }))
@@ -46,6 +52,10 @@ router.post("/", validateListing, wrapAsync(async (req, res, next) => {
 router.get("/:id/edit", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const editListing = await listing.findById(id);
+    if (!editListing) {
+        req.flash("error", "This listing doesn't exists..");
+        return res.redirect("/listing");
+    }
     res.render("listings/edit.ejs", { editListing });
 }))
 
